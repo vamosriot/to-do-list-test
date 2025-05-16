@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get It Done - Task Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Get It Done">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Get It Done</h1>
+            <button id="addTaskBtn" class="add-button">
+                <span>+</span> Add Task
+            </button>
+        </header>
+
+        <main>
+            <section class="tasks-section">
+                <h2>Active Tasks</h2>
+                <div id="activeTasks" class="tasks-list"></div>
+            </section>
+
+            <section class="tasks-section">
+                <h2>Completed Tasks</h2>
+                <div id="completedTasks" class="tasks-list"></div>
+            </section>
+        </main>
+
+        <!-- Add Task Modal -->
+        <div id="taskModal" class="modal">
+            <div class="modal-content">
+                <h2>Add New Task</h2>
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskTitle">Title</label>
+                        <input type="text" id="taskTitle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDueDate">Due Date</label>
+                        <input type="date" id="taskDueDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskNotes">Notes</label>
+                        <textarea id="taskNotes"></textarea>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="button" id="cancelTask" class="button-secondary">Cancel</button>
+                        <button type="submit" class="button-primary">Add Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 
