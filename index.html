@@ -18,7 +18,7 @@
         <section class="tasks-section" id="activeTasks">
             <div class="section-header">
                 <h2>Get them done!</h2>
-                <span class="task-count">7 tasks</span>
+                <span class="task-count"></span>
             </div>
             <div class="tasks-list"></div>
         </section>
@@ -26,7 +26,7 @@
         <section class="tasks-section" id="completedTasks">
             <div class="section-header">
                 <h2>Done!</h2>
-                <span class="task-count">7 tasks</span>
+                <span class="task-count"></span>
             </div>
             <div class="tasks-list"></div>
         </section>
@@ -59,6 +59,36 @@
                         <label for="taskNotes">Notes</label>
                         <textarea id="taskNotes"></textarea>
                     </div>
+
+                    <div class="form-buttons">
+                        <button type="button" id="cancelTask" class="button-secondary">Cancel</button>
+                        <button type="submit" class="button-primary">Add Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <button id="addTaskBtn" class="add-button">
+            <span>+</span>
+        </button>
+    </div>
+    <script src="./app.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 
 
                     <div class="form-buttons">
                         <button type="button" id="cancelTask" class="button-secondary">Cancel</button>
