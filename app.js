@@ -40,21 +40,52 @@ class TaskManager {
         this.renderTasks();
     }
 
-    renderTasks() {
-        const activeTasks = document.getElementById('activeTasks');
-        const completedTasks = document.getElementById('completedTasks');
+    formatDateTime(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
         
-        activeTasks.innerHTML = '';
-        completedTasks.innerHTML = '';
+        let dateText = '';
+        if (date.toDateString() === today.toDateString()) {
+            dateText = 'Today';
+        } else if (date.toDateString() === tomorrow.toDateString()) {
+            dateText = 'Tomorrow';
+        } else {
+            dateText = date.toLocaleDateString();
+        }
+        
+        return `${dateText} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+    }
+
+    updateTaskCounts() {
+        const activeTasks = this.tasks.filter(task => !task.isCompleted).length;
+        const completedTasks = this.tasks.filter(task => task.isCompleted).length;
+        const totalTasks = this.tasks.length;
+        
+        document.querySelector('#activeTasks .task-count').textContent = `${activeTasks} tasks`;
+        document.querySelector('#completedTasks .task-count').textContent = 
+            `${completedTasks} tasks (${Math.round((completedTasks / totalTasks) * 100) || 0}% completed)`;
+    }
+
+    renderTasks() {
+        const activeTasksList = document.querySelector('#activeTasks .tasks-list');
+        const completedTasksList = document.querySelector('#completedTasks .tasks-list');
+        
+        activeTasksList.innerHTML = '';
+        completedTasksList.innerHTML = '';
 
         this.tasks.forEach(task => {
             const taskElement = this.createTaskElement(task);
             if (task.isCompleted) {
-                completedTasks.appendChild(taskElement);
+                completedTasksList.appendChild(taskElement);
             } else {
-                activeTasks.appendChild(taskElement);
+                activeTasksList.appendChild(taskElement);
             }
         });
+
+        this.updateTaskCounts();
     }
 
     createTaskElement(task) {
@@ -67,20 +98,16 @@ class TaskManager {
             </div>
             <div class="task-content">
                 <div class="task-title ${task.isCompleted ? 'completed' : ''}">${task.title}</div>
-                <div class="task-details">
-                    ${task.dueDate ? `Due: ${new Date(task.dueDate).toLocaleDateString()}` : ''}
-                    <span class="task-priority priority-${task.priority}">${task.priority}</span>
-                </div>
-                ${task.notes ? `<div class="task-notes">${task.notes}</div>` : ''}
+                ${task.dueDate || task.priority || task.notes ? `
+                    <div class="task-details">
+                        ${task.dueDate ? `Due: ${this.formatDateTime(task.dueDate)}` : ''}
+                        ${task.priority ? `<span class="task-priority">${task.priority}</span>` : ''}
+                        ${task.notes ? `<div class="task-notes">${task.notes}</div>` : ''}
+                    </div>
+                ` : ''}
             </div>
+            <button class="delete-btn" onclick="taskManager.deleteTask(${task.id})">🗑️</button>
         `;
-
-        // Add delete functionality
-        const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '🗑️';
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.onclick = () => this.deleteTask(task.id);
-        taskDiv.appendChild(deleteBtn);
 
         return taskDiv;
     }
@@ -135,6 +162,11 @@ class ModalManager {
 }
 
 // Initialize
+const taskManager = new TaskManager();
+const modalManager = new ModalManager();
+
+// Initial render
+taskManager.renderTasks(); 
 const taskManager = new TaskManager();
 const modalManager = new ModalManager();
 
