@@ -142,23 +142,45 @@ class ModalManager {
     }
 
     setupEventListeners() {
-        this.addButton.onclick = () => this.openModal();
-        this.cancelButton.onclick = () => this.closeModal();
-        this.form.onsubmit = (e) => this.handleSubmit(e);
+        if (this.addButton) {
+            this.addButton.onclick = () => {
+                console.log('Add Task button clicked');
+                this.openModal();
+            };
+        } else {
+            console.warn('Add Task button not found');
+        }
+        if (this.cancelButton) {
+            this.cancelButton.onclick = () => {
+                console.log('Cancel button clicked');
+                this.closeModal();
+            };
+        } else {
+            console.warn('Cancel button not found');
+        }
+        if (this.form) {
+            this.form.onsubmit = (e) => {
+                console.log('Form submitted');
+                this.handleSubmit(e);
+            };
+        } else {
+            console.warn('Task form not found');
+        }
         window.onclick = (e) => {
             if (e.target === this.modal) {
+                console.log('Clicked outside modal');
                 this.closeModal();
             }
         };
     }
 
     openModal() {
-        this.modal.classList.add('show');
+        if (this.modal) this.modal.classList.add('show');
     }
 
     closeModal() {
-        this.modal.classList.remove('show');
-        this.form.reset();
+        if (this.modal) this.modal.classList.remove('show');
+        if (this.form) this.form.reset();
     }
 
     handleSubmit(e) {
