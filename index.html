@@ -3,35 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get It Done - Task Manager</title>
+    <title>Get IT Done</title>
     <link rel="stylesheet" href="./styles.css">
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#4CAF50">
+    <meta name="theme-color" content="#E5F3FF">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Get It Done">
-    <link rel="apple-touch-icon" href="./icons/icon-152x152.png">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Get IT Done">
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+    <link rel="apple-touch-icon" href="./icons/icon.svg">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Get It Done</h1>
-            <button id="addTaskBtn" class="add-button">
-                <span>+</span> Add Task
-            </button>
-        </header>
+        <section class="tasks-section" id="activeTasks">
+            <div class="section-header">
+                <h2>Get them done!</h2>
+                <span class="task-count">7 tasks</span>
+            </div>
+            <div class="tasks-list"></div>
+        </section>
 
-        <main>
-            <section class="tasks-section">
-                <h2>Active Tasks</h2>
-                <div id="activeTasks" class="tasks-list"></div>
-            </section>
-
-            <section class="tasks-section">
-                <h2>Completed Tasks</h2>
-                <div id="completedTasks" class="tasks-list"></div>
-            </section>
-        </main>
+        <section class="tasks-section" id="completedTasks">
+            <div class="section-header">
+                <h2>Done!</h2>
+                <span class="task-count">7 tasks</span>
+            </div>
+            <div class="tasks-list"></div>
+        </section>
 
         <!-- Add Task Modal -->
         <div id="taskModal" class="modal">
@@ -44,8 +42,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="taskDueDate">Due Date</label>
-                        <input type="date" id="taskDueDate">
+                        <label for="taskDueDate">Due Date & Time</label>
+                        <input type="datetime-local" id="taskDueDate">
                     </div>
 
                     <div class="form-group">
@@ -69,6 +67,10 @@
                 </form>
             </div>
         </div>
+
+        <button id="addTaskBtn" class="add-button">
+            <span>+</span>
+        </button>
     </div>
     <script src="./app.js"></script>
     <script>
