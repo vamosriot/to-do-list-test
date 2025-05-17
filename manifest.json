@@ -2,7 +2,7 @@
     "name": "Get IT Done",
     "short_name": "Get IT Done",
     "description": "A simple and elegant task management app",
-    "start_url": "/",
+    "start_url": "/to-do-list-test/index.html",
     "display": "standalone",
     "background_color": "#E5F3FF",
     "theme_color": "#E5F3FF",
@@ -14,4 +14,4 @@
             "purpose": "any"
         }
     ]
-}  
+} 
