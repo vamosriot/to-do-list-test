@@ -1,0 +1,8 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1024" height="1024" rx="256" fill="#E5F3FF"/>
+    
+    <!-- Text -->
+    <text x="512" y="400" font-family="Arial, sans-serif" font-size="200" font-weight="bold" fill="white" text-anchor="middle">Get IT</text>
+    <text x="512" y="600" font-family="Arial, sans-serif" font-size="200" font-weight="bold" fill="white" text-anchor="middle">Done</text>
+</svg> 
