@@ -63,28 +63,42 @@ class TaskManager {
         const activeTasks = this.tasks.filter(task => !task.isCompleted).length;
         const completedTasks = this.tasks.filter(task => task.isCompleted).length;
         const totalTasks = this.tasks.length;
-        
-        document.querySelector('#activeTasks .task-count').textContent = `${activeTasks} tasks`;
-        document.querySelector('#completedTasks .task-count').textContent = 
-            `${completedTasks} tasks (${Math.round((completedTasks / totalTasks) * 100) || 0}% completed)`;
+        const activeCountEl = document.querySelector('#activeTasks .task-count');
+        const completedCountEl = document.querySelector('#completedTasks .task-count');
+        if (activeCountEl) activeCountEl.textContent = `${activeTasks} tasks`;
+        if (completedCountEl) completedCountEl.textContent = `${completedTasks} tasks (${Math.round((completedTasks / totalTasks) * 100) || 0}% completed)`;
     }
 
     renderTasks() {
         const activeTasksList = document.querySelector('#activeTasks .tasks-list');
         const completedTasksList = document.querySelector('#completedTasks .tasks-list');
-        
+        if (!activeTasksList || !completedTasksList) return;
         activeTasksList.innerHTML = '';
         completedTasksList.innerHTML = '';
 
+        let hasActive = false, hasCompleted = false;
         this.tasks.forEach(task => {
             const taskElement = this.createTaskElement(task);
             if (task.isCompleted) {
                 completedTasksList.appendChild(taskElement);
+                hasCompleted = true;
             } else {
                 activeTasksList.appendChild(taskElement);
+                hasActive = true;
             }
         });
-
+        if (!hasActive) {
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+            empty.textContent = 'No tasks yet!';
+            activeTasksList.appendChild(empty);
+        }
+        if (!hasCompleted) {
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+            empty.textContent = 'No completed tasks yet!';
+            completedTasksList.appendChild(empty);
+        }
         this.updateTaskCounts();
     }
 
@@ -108,7 +122,6 @@ class TaskManager {
             </div>
             <button class="delete-btn" onclick="taskManager.deleteTask(${task.id})">🗑️</button>
         `;
-
         return taskDiv;
     }
 }
@@ -120,7 +133,11 @@ class ModalManager {
         this.form = document.getElementById('taskForm');
         this.addButton = document.getElementById('addTaskBtn');
         this.cancelButton = document.getElementById('cancelTask');
-
+        if (this.modal) {
+            this.modal.setAttribute('role', 'dialog');
+            this.modal.setAttribute('aria-modal', 'true');
+            this.modal.setAttribute('aria-labelledby', 'modalTitle');
+        }
         this.setupEventListeners();
     }
 
@@ -128,8 +145,6 @@ class ModalManager {
         this.addButton.onclick = () => this.openModal();
         this.cancelButton.onclick = () => this.closeModal();
         this.form.onsubmit = (e) => this.handleSubmit(e);
-
-        // Close modal when clicking outside
         window.onclick = (e) => {
             if (e.target === this.modal) {
                 this.closeModal();
@@ -148,14 +163,12 @@ class ModalManager {
 
     handleSubmit(e) {
         e.preventDefault();
-
         const formData = {
             title: document.getElementById('taskTitle').value,
             dueDate: document.getElementById('taskDueDate').value,
             priority: document.getElementById('taskPriority').value,
             notes: document.getElementById('taskNotes').value
         };
-
         taskManager.addTask(formData);
         this.closeModal();
     }
@@ -164,11 +177,4 @@ class ModalManager {
 // Initialize
 const taskManager = new TaskManager();
 const modalManager = new ModalManager();
-
-// Initial render
-taskManager.renderTasks(); 
-const taskManager = new TaskManager();
-const modalManager = new ModalManager();
-
-// Initial render
 taskManager.renderTasks(); 
