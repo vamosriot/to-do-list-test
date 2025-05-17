@@ -89,33 +89,3 @@
     </script>
 </body>
 </html> 
-
-                    <div class="form-buttons">
-                        <button type="button" id="cancelTask" class="button-secondary">Cancel</button>
-                        <button type="submit" class="button-primary">Add Task</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <button id="addTaskBtn" class="add-button">
-            <span>+</span>
-        </button>
-    </div>
-    <script src="./app.js"></script>
-    <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
-    </script>
-</body>
-</html> 
