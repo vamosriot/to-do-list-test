@@ -199,4 +199,11 @@ button {
 
 .add-button span {
     margin-right: 0;
+}
+
+.empty-state {
+    text-align: center;
+    color: #888;
+    padding: 24px 0;
+    font-size: 1.1em;
 } 
