@@ -74,6 +74,11 @@
     </div>
     <script src="./app.js"></script>
     <script>
+        // Initialize managers after app.js loads
+        window.taskManager = new TaskManager();
+        window.modalManager = new ModalManager();
+        window.taskManager.renderTasks();
+
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
