@@ -243,9 +243,4 @@ class ModalManager {
         
         this.closeModal();
     }
-}
-
-// Initialize
-window.taskManager = new TaskManager();
-window.modalManager = new ModalManager();
-window.taskManager.renderTasks(); 
+} 
