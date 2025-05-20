@@ -106,8 +106,7 @@ class TaskManager {
         const taskDiv = document.createElement('div');
         taskDiv.className = 'task-item';
         taskDiv.innerHTML = `
-            <div class="task-checkbox ${task.isCompleted ? 'checked' : ''}" 
-                 onclick="taskManager.toggleTask(${task.id})">
+            <div class="task-checkbox ${task.isCompleted ? 'checked' : ''}">
                 ${task.isCompleted ? '✓' : ''}
             </div>
             <div class="task-content">
@@ -121,10 +120,21 @@ class TaskManager {
                 ` : ''}
             </div>
             <div class="task-actions">
-                <button class="edit-btn" onclick="modalManager.openModal(${task.id})">✏️</button>
-                <button class="delete-btn" onclick="taskManager.deleteTask(${task.id})">🗑️</button>
+                <button class="edit-btn">✏️</button>
+                <button class="delete-btn">🗑️</button>
             </div>
         `;
+
+        // Add event listeners
+        const checkbox = taskDiv.querySelector('.task-checkbox');
+        checkbox.addEventListener('click', () => this.toggleTask(task.id));
+
+        const editBtn = taskDiv.querySelector('.edit-btn');
+        editBtn.addEventListener('click', () => modalManager.openModal(task.id));
+
+        const deleteBtn = taskDiv.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', () => this.deleteTask(task.id));
+
         return taskDiv;
     }
 }
@@ -137,27 +147,50 @@ class ModalManager {
         this.addButton = document.getElementById('addTaskBtn');
         this.cancelButton = document.getElementById('cancelTask');
         this.currentTaskId = null;
-        if (this.modal) {
-            this.modal.setAttribute('role', 'dialog');
-            this.modal.setAttribute('aria-modal', 'true');
-            this.modal.setAttribute('aria-labelledby', 'modalTitle');
+
+        // Check for required elements
+        if (!this.modal) {
+            console.error('Modal element not found. Make sure element with id="taskModal" exists.');
+            return;
         }
+
+        if (!this.form) {
+            console.error('Form element not found. Make sure element with id="taskForm" exists.');
+            return;
+        }
+
+        // Set up modal attributes
+        this.modal.setAttribute('role', 'dialog');
+        this.modal.setAttribute('aria-modal', 'true');
+        this.modal.setAttribute('aria-labelledby', 'modalTitle');
+
         this.setupEventListeners();
     }
 
     setupEventListeners() {
+        // Add task button
         if (this.addButton) {
             this.addButton.onclick = () => {
                 this.currentTaskId = null;
                 this.openModal();
             };
+        } else {
+            console.warn('Add Task button not found. Make sure element with id="addTaskBtn" exists.');
         }
+
+        // Cancel button
         if (this.cancelButton) {
             this.cancelButton.onclick = () => this.closeModal();
+        } else {
+            console.warn('Cancel button not found. Make sure element with id="cancelTask" exists.');
         }
+
+        // Form submission
         if (this.form) {
             this.form.onsubmit = (e) => this.handleSubmit(e);
         }
+
+        // Click outside modal to close
         window.onclick = (e) => {
             if (e.target === this.modal) {
                 this.closeModal();
@@ -213,11 +246,8 @@ class ModalManager {
 }
 
 // Initialize
-const taskManager = new TaskManager();
-const modalManager = new ModalManager();
-taskManager.renderTasks(); 
-
-// Initialize
-const taskManager = new TaskManager();
-const modalManager = new ModalManager();
-taskManager.renderTasks(); 
+document.addEventListener('DOMContentLoaded', () => {
+    const taskManager = new TaskManager();
+    const modalManager = new ModalManager();
+    taskManager.renderTasks();
+}); 
