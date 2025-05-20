@@ -111,10 +111,9 @@ class TaskManager {
             </div>
             <div class="task-content">
                 <div class="task-title ${task.isCompleted ? 'completed' : ''}">${task.title}</div>
-                ${task.dueDate || task.priority || task.notes ? `
+                ${task.dueDate || task.notes ? `
                     <div class="task-details">
                         ${task.dueDate ? `Due: ${this.formatDateTime(task.dueDate)}` : ''}
-                        ${task.priority ? `<span class="task-priority">${task.priority}</span>` : ''}
                         ${task.notes ? `<div class="task-notes">${task.notes}</div>` : ''}
                     </div>
                 ` : ''}
@@ -210,7 +209,6 @@ class ModalManager {
             if (task) {
                 document.getElementById('taskTitle').value = task.title;
                 document.getElementById('taskDueDate').value = task.dueDate || '';
-                document.getElementById('taskPriority').value = task.priority || '';
                 document.getElementById('taskNotes').value = task.notes || '';
             }
         } else {
@@ -231,7 +229,6 @@ class ModalManager {
         const formData = {
             title: document.getElementById('taskTitle').value,
             dueDate: document.getElementById('taskDueDate').value,
-            priority: document.getElementById('taskPriority').value,
             notes: document.getElementById('taskNotes').value
         };
 
