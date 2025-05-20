@@ -91,34 +91,70 @@
         // Setup Firebase Cloud Messaging
         const messaging = firebase.messaging();
 
-        async function subscribeToPush() {
-            /* Must run from a real click (Safari requirement) */
-            const perm = await Notification.requestPermission();
-            if (perm !== 'granted') return;
-
-            /* Your public VAPID key exactly as generated */
-            const token = await messaging.getToken({
-                vapidKey: 'BPtAmMri69KCwIpo7q93PR-aYE5EdPlFJqpoFUXatOQzRjgAbxKrTt4mw5WtmjpuBVF8rzaeoBxepIwSUUb7s14'
-            });
-
-            console.log('FCM token →', token);
-            /* Store token in IndexedDB for now */
-            await db.pushTokens.add({ token, createdAt: new Date() });
-            
-            // Update button state
-            const enablePushBtn = document.getElementById('enablePush');
-            if (enablePushBtn) {
-                enablePushBtn.textContent = 'Reminders Enabled';
-                enablePushBtn.disabled = true;
+        async function initPushOnce() {
+            const enabled = localStorage.getItem('pushEnabled');
+            if (enabled) {
+                document.getElementById('enablePush')?.remove();   // už schváleno
+                return;
             }
-        }
 
-        document.getElementById('enablePush').onclick = subscribeToPush;
+            const btn = document.getElementById('enablePush');
+            if (!btn) return;
+
+            btn.addEventListener('click', async () => {
+                const token = await notificationManager.subscribeToPush(); // tvá funkce
+                if (token) {
+                    localStorage.setItem('pushEnabled', '1');
+                    btn.remove();                                  // schovat navždy
+                }
+            });
+        }
 
         // Initialize managers after all scripts are loaded
         window.taskManager = new TaskManager();
         window.modalManager = new ModalManager();
         window.taskManager.renderTasks();
+        initPushOnce();
+
+        // Settings Modal Functionality
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const pushToggle = document.getElementById('pushToggle');
+        const closeSettings = document.getElementById('settingsClose');
+
+        settingsBtn.onclick = () => settingsModal.classList.add('show');
+        closeSettings.onclick = () => settingsModal.classList.remove('show');
+        window.onclick = e => { if (e.target === settingsModal) settingsModal.classList.remove('show'); };
+
+        pushToggle.checked = !!localStorage.getItem('pushEnabled');
+
+        pushToggle.onchange = async () => {
+            if (pushToggle.checked) {
+                const token = await notificationManager.subscribeToPush();
+                if (token) localStorage.setItem('pushEnabled','1');
+                else pushToggle.checked = false;  // neuděleno
+            } else {
+                // odhlášení – volitelné: messaging.deleteToken(token)
+                localStorage.removeItem('pushEnabled');
+            }
+        };
     </script>
+
+    <!-- Settings Button and Modal -->
+    <button id="settingsBtn" class="fab-settings">⚙️</button>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3>Nastavení</h3>
+            <label class="switch">
+                <input type="checkbox" id="pushToggle">
+                <span class="slider"></span>
+                Push připomínky
+            </label>
+            <button type="button" id="settingsClose" class="button-secondary">
+                Zavřít
+            </button>
+        </div>
+    </div>
 </body>
 </html> 
