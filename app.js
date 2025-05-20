@@ -12,7 +12,7 @@ class NotificationManager {
     constructor() {
         this.checkInterval = 60000; // Check every minute
         this.notifiedTasks = new Set(); // Keep track of tasks we've already notified about
-        this.vapidPublicKey = 'YOUR_PUBLIC_VAPID_KEY'; // Replace with your actual VAPID key
+        this.vapidPublicKey = 'BPtAmMri69KCwIpo7q93PR-aYE5EdPlFJqpoFUXatOQzRjgAbxKrTt4mw5WtmjpuBVF8rzaeoBxepIwSUUb7s14';
     }
 
     async requestPermission() {
@@ -27,17 +27,22 @@ class NotificationManager {
 
     async subscribeToPush() {
         try {
-            const registration = await navigator.serviceWorker.ready;
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: this.vapidPublicKey
+            // 1️⃣ make sure the service-worker is registered
+            const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+
+            // 2️⃣ get the FCM token (works on Safari iOS 16.4+, Chrome, Edge, etc.)
+            const messaging = firebase.messaging();
+            const token = await messaging.getToken({
+                serviceWorkerRegistration: reg,
+                vapidKey: this.vapidPublicKey
             });
 
-            // Here you would typically send the subscription to your server
-            console.log('Push subscription:', subscription);
-            return subscription;
-        } catch (error) {
-            console.error('Error subscribing to push:', error);
+            // 3️⃣ persist it locally for now (later you'll POST to Firestore)
+            await db.pushTokens.add({ token, createdAt: new Date() });
+            console.log('FCM token →', token);
+            return token;
+        } catch (err) {
+            console.error('FCM subscribe error:', err);
             return null;
         }
     }
