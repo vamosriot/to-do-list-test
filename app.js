@@ -374,20 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.modalManager = new ModalManager();
     window.taskManager.renderTasks();
 
-    // Setup enable reminders button
-    const enableRemindersBtn = document.getElementById('enableReminders');
-    if (enableRemindersBtn) {
-        enableRemindersBtn.addEventListener('click', async () => {
-            const ok = await taskManager.notificationManager.requestPermission();
-            if (ok) {
-                await taskManager.notificationManager.subscribeToPush();
-                taskManager.notificationManager.startChecking();
-                enableRemindersBtn.textContent = 'Reminders Enabled';
-                enableRemindersBtn.disabled = true;
-            }
-        });
-    }
-
     // Settings UI
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsModal = document.getElementById('settingsModal');
@@ -422,6 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // (Optional) unsubscribe from FCM here if you store tokens server-side
             localStorage.removeItem('pushEnabled');
+            taskManager.notificationManager.stopChecking();
         }
     };
 
