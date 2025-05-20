@@ -2,15 +2,95 @@
 const db = new Dexie('GetItDoneDB');
 
 // Define the database schema
-db.version(1).stores({
-    tasks: '++id, title, dueDate, notes, isCompleted, createdAt'
+db.version(3).stores({
+    tasks: '++id, [isCompleted+dueDate], title, notes, createdAt',
+    pushTokens: '++id, token, createdAt'
 });
+
+// Notification setup
+class NotificationManager {
+    constructor() {
+        this.checkInterval = 60000; // Check every minute
+        this.notifiedTasks = new Set(); // Keep track of tasks we've already notified about
+        this.vapidPublicKey = 'YOUR_PUBLIC_VAPID_KEY'; // Replace with your actual VAPID key
+    }
+
+    async requestPermission() {
+        if (!("Notification" in window)) {
+            console.log("This browser does not support notifications");
+            return false;
+        }
+
+        const permission = await Notification.requestPermission();
+        return permission === "granted";
+    }
+
+    async subscribeToPush() {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: this.vapidPublicKey
+            });
+
+            // Here you would typically send the subscription to your server
+            console.log('Push subscription:', subscription);
+            return subscription;
+        } catch (error) {
+            console.error('Error subscribing to push:', error);
+            return null;
+        }
+    }
+
+    async checkDueTasks() {
+        const now = new Date();
+        const tasks = await db.tasks
+            .where(['isCompleted', 'dueDate'])
+            .between([false, now], [false, new Date(now.getTime() + this.checkInterval)])
+            .toArray();
+
+        for (const task of tasks) {
+            if (!this.notifiedTasks.has(task.id)) {
+                // Here you would typically send a push notification through your server
+                // For now, we'll show a local notification
+                this.showNotification(task);
+                this.notifiedTasks.add(task.id);
+            }
+        }
+    }
+
+    showNotification(task) {
+        if (Notification.permission === "granted") {
+            new Notification("Dělej!", {
+                body: `"${task.title}" Dělej vole, máš tu task`,
+                icon: "./icons/icon.svg",
+                tag: task.id // prevent duplicates
+            });
+        }
+    }
+
+    startChecking() {
+        // Check immediately
+        this.checkDueTasks();
+        // Then check periodically
+        setInterval(() => this.checkDueTasks(), this.checkInterval);
+    }
+}
 
 // Task Management
 class TaskManager {
     constructor() {
         this.tasks = [];
         this.loadTasks();
+        this.notificationManager = new NotificationManager();
+        this.setupNotifications();
+    }
+
+    async setupNotifications() {
+        const hasPermission = await this.notificationManager.requestPermission();
+        if (hasPermission) {
+            this.notificationManager.startChecking();
+        }
     }
 
     async loadTasks() {
@@ -274,7 +354,25 @@ class ModalManager {
         
         this.closeModal();
     }
-} 
-        this.closeModal();
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    window.taskManager = new TaskManager();
+    window.modalManager = new ModalManager();
+    window.taskManager.renderTasks();
+
+    // Setup enable reminders button
+    const enableRemindersBtn = document.getElementById('enableReminders');
+    if (enableRemindersBtn) {
+        enableRemindersBtn.addEventListener('click', async () => {
+            const ok = await taskManager.notificationManager.requestPermission();
+            if (ok) {
+                await taskManager.notificationManager.subscribeToPush();
+                taskManager.notificationManager.startChecking();
+                enableRemindersBtn.textContent = 'Reminders Enabled';
+                enableRemindersBtn.disabled = true;
+            }
+        });
     }
-} 
+}); 
