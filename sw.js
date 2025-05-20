@@ -27,4 +27,17 @@ self.addEventListener('fetch', event => {
         caches.match(event.request)
             .then(response => response || fetch(event.request))
     );
+});
+
+// Handle push notifications
+self.addEventListener('push', event => {
+    const data = event.data.json();
+
+    event.waitUntil(
+        self.registration.showNotification(data.title, {
+            body: data.body,
+            icon: '/icons/icon.svg',
+            tag: data.id // prevent duplicates
+        })
+    );
 }); 
