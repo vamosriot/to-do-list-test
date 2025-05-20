@@ -13,5 +13,7 @@
             "type": "image/svg+xml",
             "purpose": "any"
         }
-    ]
+    ],
+    "gcm_sender_id": "1076164214014",
+    "gcm_sender_id_comment": "Do not change"
 } 
