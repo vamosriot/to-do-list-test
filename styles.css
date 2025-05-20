@@ -65,6 +65,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    position: relative;
 }
 
 .task-checkbox {
@@ -86,6 +87,7 @@ body {
 
 .task-content {
     flex: 1;
+    min-width: 0;
 }
 
 .task-title {
@@ -102,6 +104,8 @@ body {
     display: flex;
     gap: 8px;
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
 .edit-btn, .delete-btn {
@@ -112,6 +116,8 @@ body {
     font-size: 16px;
     opacity: 0.7;
     transition: opacity 0.2s;
+    position: relative;
+    z-index: 2;
 }
 
 .edit-btn:hover, .delete-btn:hover {
