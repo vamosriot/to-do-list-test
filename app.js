@@ -1,43 +1,77 @@
+// Database setup
+const db = new Dexie('GetItDoneDB');
+
+// Define the database schema
+db.version(1).stores({
+    tasks: '++id, title, dueDate, notes, isCompleted, createdAt'
+});
+
 // Task Management
 class TaskManager {
     constructor() {
-        this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        this.tasks = [];
+        this.loadTasks();
     }
 
-    addTask(task) {
-        this.tasks.push({
-            id: Date.now(),
-            ...task,
-            createdAt: new Date(),
-            isCompleted: false
-        });
-        this.saveTasks();
-    }
-
-    deleteTask(taskId) {
-        this.tasks = this.tasks.filter(task => task.id !== taskId);
-        this.saveTasks();
-    }
-
-    toggleTask(taskId) {
-        const task = this.tasks.find(task => task.id === taskId);
-        if (task) {
-            task.isCompleted = !task.isCompleted;
-            this.saveTasks();
+    async loadTasks() {
+        try {
+            this.tasks = await db.tasks.toArray();
+            this.renderTasks();
+        } catch (error) {
+            console.error('Error loading tasks:', error);
         }
     }
 
-    updateTask(taskId, updates) {
-        const task = this.tasks.find(task => task.id === taskId);
-        if (task) {
-            Object.assign(task, updates);
-            this.saveTasks();
+    async addTask(task) {
+        try {
+            const newTask = {
+                ...task,
+                createdAt: new Date(),
+                isCompleted: false
+            };
+            const id = await db.tasks.add(newTask);
+            newTask.id = id;
+            this.tasks.push(newTask);
+            this.renderTasks();
+        } catch (error) {
+            console.error('Error adding task:', error);
         }
     }
 
-    saveTasks() {
-        localStorage.setItem('tasks', JSON.stringify(this.tasks));
-        this.renderTasks();
+    async deleteTask(taskId) {
+        try {
+            await db.tasks.delete(taskId);
+            this.tasks = this.tasks.filter(task => task.id !== taskId);
+            this.renderTasks();
+        } catch (error) {
+            console.error('Error deleting task:', error);
+        }
+    }
+
+    async toggleTask(taskId) {
+        try {
+            const task = this.tasks.find(task => task.id === taskId);
+            if (task) {
+                task.isCompleted = !task.isCompleted;
+                await db.tasks.update(taskId, { isCompleted: task.isCompleted });
+                this.renderTasks();
+            }
+        } catch (error) {
+            console.error('Error toggling task:', error);
+        }
+    }
+
+    async updateTask(taskId, updates) {
+        try {
+            const task = this.tasks.find(task => task.id === taskId);
+            if (task) {
+                Object.assign(task, updates);
+                await db.tasks.update(taskId, updates);
+                this.renderTasks();
+            }
+        } catch (error) {
+            console.error('Error updating task:', error);
+        }
     }
 
     formatDateTime(dateString) {
@@ -238,6 +272,9 @@ class ModalManager {
             taskManager.addTask(formData);
         }
         
+        this.closeModal();
+    }
+} 
         this.closeModal();
     }
 } 
