@@ -114,7 +114,8 @@ class TaskManager {
             const newTask = {
                 ...task,
                 createdAt: new Date(),
-                isCompleted: false
+                isCompleted: false,
+                dueDate: task.dueDate ? new Date(task.dueDate) : undefined
             };
             const id = await db.tasks.add(newTask);
             newTask.id = id;
@@ -152,6 +153,10 @@ class TaskManager {
         try {
             const task = this.tasks.find(task => task.id === taskId);
             if (task) {
+                // Convert dueDate string to Date object if present
+                if (updates.dueDate) {
+                    updates.dueDate = new Date(updates.dueDate);
+                }
                 Object.assign(task, updates);
                 await db.tasks.update(taskId, updates);
                 this.renderTasks();
