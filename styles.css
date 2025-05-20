@@ -230,4 +230,68 @@ button {
 #enableReminders {
     font-size: 14px;
     padding: 6px 12px;
+}
+
+/* Settings Button and Modal Styles */
+.fab-settings {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: #000;
+    color: #fff;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    cursor: pointer;
+    border: none;
+    z-index: 1000;
+}
+
+.switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+/* Toggle Switch Styles */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 24px;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #000;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
 } 
