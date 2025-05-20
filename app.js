@@ -120,7 +120,10 @@ class TaskManager {
                     </div>
                 ` : ''}
             </div>
-            <button class="delete-btn" onclick="taskManager.deleteTask(${task.id})">🗑️</button>
+            <div class="task-actions">
+                <button class="edit-btn" onclick="modalManager.openModal(${task.id})">✏️</button>
+                <button class="delete-btn" onclick="taskManager.deleteTask(${task.id})">🗑️</button>
+            </div>
         `;
         return taskDiv;
     }
@@ -133,6 +136,7 @@ class ModalManager {
         this.form = document.getElementById('taskForm');
         this.addButton = document.getElementById('addTaskBtn');
         this.cancelButton = document.getElementById('cancelTask');
+        this.currentTaskId = null;
         if (this.modal) {
             this.modal.setAttribute('role', 'dialog');
             this.modal.setAttribute('aria-modal', 'true');
@@ -144,43 +148,49 @@ class ModalManager {
     setupEventListeners() {
         if (this.addButton) {
             this.addButton.onclick = () => {
-                console.log('Add Task button clicked');
+                this.currentTaskId = null;
                 this.openModal();
             };
-        } else {
-            console.warn('Add Task button not found');
         }
         if (this.cancelButton) {
-            this.cancelButton.onclick = () => {
-                console.log('Cancel button clicked');
-                this.closeModal();
-            };
-        } else {
-            console.warn('Cancel button not found');
+            this.cancelButton.onclick = () => this.closeModal();
         }
         if (this.form) {
-            this.form.onsubmit = (e) => {
-                console.log('Form submitted');
-                this.handleSubmit(e);
-            };
-        } else {
-            console.warn('Task form not found');
+            this.form.onsubmit = (e) => this.handleSubmit(e);
         }
         window.onclick = (e) => {
             if (e.target === this.modal) {
-                console.log('Clicked outside modal');
                 this.closeModal();
             }
         };
     }
 
-    openModal() {
+    openModal(taskId = null) {
+        this.currentTaskId = taskId;
+        const modalTitle = document.getElementById('modalTitle');
+        if (modalTitle) {
+            modalTitle.textContent = taskId ? 'Edit Task' : 'Add New Task';
+        }
+        
+        if (taskId) {
+            const task = taskManager.tasks.find(t => t.id === taskId);
+            if (task) {
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskDueDate').value = task.dueDate || '';
+                document.getElementById('taskPriority').value = task.priority || '';
+                document.getElementById('taskNotes').value = task.notes || '';
+            }
+        } else {
+            this.form.reset();
+        }
+        
         if (this.modal) this.modal.classList.add('show');
     }
 
     closeModal() {
         if (this.modal) this.modal.classList.remove('show');
         if (this.form) this.form.reset();
+        this.currentTaskId = null;
     }
 
     handleSubmit(e) {
@@ -191,10 +201,21 @@ class ModalManager {
             priority: document.getElementById('taskPriority').value,
             notes: document.getElementById('taskNotes').value
         };
-        taskManager.addTask(formData);
+
+        if (this.currentTaskId) {
+            taskManager.updateTask(this.currentTaskId, formData);
+        } else {
+            taskManager.addTask(formData);
+        }
+        
         this.closeModal();
     }
 }
+
+// Initialize
+const taskManager = new TaskManager();
+const modalManager = new ModalManager();
+taskManager.renderTasks(); 
 
 // Initialize
 const taskManager = new TaskManager();
