@@ -219,4 +219,15 @@ button {
     color: #888;
     padding: 24px 0;
     font-size: 1.1em;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#enableReminders {
+    font-size: 14px;
+    padding: 6px 12px;
 } 
