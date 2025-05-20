@@ -1,7 +1,8 @@
 /* Firebase Cloud Messaging Service Worker */
-importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js');
 
+// Firebase configuration
 firebase.initializeApp({
     apiKey: "AIzaSyDVc8YtOD5Km-RDhGvww7x8WupcNSpWipc",
     authDomain: "get-it-done-52bb1.firebaseapp.com",
@@ -15,14 +16,7 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 /* Show the push when it arrives in the background */
-messaging.onBackgroundMessage((payload) => {
-    console.log('Received background message:', payload);
-
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/icons/icon.svg'
-    };
-
-    self.registration.showNotification(notificationTitle, notificationOptions);
+messaging.onBackgroundMessage(payload => {
+    const { title, body, icon } = payload.notification;
+    self.registration.showNotification(title, { body, icon });
 }); 
