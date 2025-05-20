@@ -246,8 +246,6 @@ class ModalManager {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    const taskManager = new TaskManager();
-    const modalManager = new ModalManager();
-    taskManager.renderTasks();
-}); 
+window.taskManager = new TaskManager();
+window.modalManager = new ModalManager();
+window.taskManager.renderTasks(); 
