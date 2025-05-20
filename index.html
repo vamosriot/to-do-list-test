@@ -36,7 +36,7 @@
 
         <!-- Add Task Modal -->
         <div id="taskModal" class="modal">
-            <div class="modal-content">
+            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
                 <h2 id="modalTitle">Add New Task</h2>
                 <form id="taskForm">
                     <div class="form-group">
@@ -67,11 +67,30 @@
         </button>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js"></script>
-    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <!-- Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
     <script src="./app.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVc8YtOD5Km-RDhGvww7x8WupcNSpWipc",
+            authDomain: "get-it-done-52bb1.firebaseapp.com",
+            projectId: "get-it-done-52bb1",
+            storageBucket: "get-it-done-52bb1.appspot.com",
+            messagingSenderId: "1076164214014",
+            appId: "1:1076164214014:web:483731f66c0d931e9ef9af",
+            measurementId: "G-69EG6J8WCD"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Setup Firebase Cloud Messaging
+        const messaging = firebase.messaging();
+    </script>
 
     <!-- ⚙️  FAB -->
     <button id="settingsBtn" class="fab-settings" aria-label="Nastavení">⚙️</button>
@@ -92,24 +111,5 @@
             </button>
         </div>
     </div>
-
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDVc8YtOD5Km-RDhGvww7x8WupcNSpWipc",
-            authDomain: "get-it-done-52bb1.firebaseapp.com",
-            projectId: "get-it-done-52bb1",
-            storageBucket: "get-it-done-52bb1.appspot.com",
-            messagingSenderId: "1076164214014",
-            appId: "1:1076164214014:web:483731f66c0d931e9ef9af",
-            measurementId: "G-69EG6J8WCD"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-
-        // Setup Firebase Cloud Messaging
-        const messaging = firebase.messaging();
-    </script>
 </body>
 </html> 
