@@ -13,6 +13,7 @@ class NotificationManager {
         this.checkInterval = 60000; // Check every minute
         this.notifiedTasks = new Set(); // Keep track of tasks we've already notified about
         this.vapidPublicKey = 'BPtAmMri69KCwIpo7q93PR-aYE5EdPlFJqpoFUXatOQzRjgAbxKrTt4mw5WtmjpuBVF8rzaeoBxepIwSUUb7s14';
+        this.checkIntervalId = null;
     }
 
     async requestPermission() {
@@ -56,8 +57,6 @@ class NotificationManager {
 
         for (const task of tasks) {
             if (!this.notifiedTasks.has(task.id)) {
-                // Here you would typically send a push notification through your server
-                // For now, we'll show a local notification
                 this.showNotification(task);
                 this.notifiedTasks.add(task.id);
             }
@@ -75,10 +74,21 @@ class NotificationManager {
     }
 
     startChecking() {
+        // Clear any existing interval
+        if (this.checkIntervalId) {
+            clearInterval(this.checkIntervalId);
+        }
         // Check immediately
         this.checkDueTasks();
         // Then check periodically
-        setInterval(() => this.checkDueTasks(), this.checkInterval);
+        this.checkIntervalId = setInterval(() => this.checkDueTasks(), this.checkInterval);
+    }
+
+    stopChecking() {
+        if (this.checkIntervalId) {
+            clearInterval(this.checkIntervalId);
+            this.checkIntervalId = null;
+        }
     }
 }
 
@@ -88,14 +98,6 @@ class TaskManager {
         this.tasks = [];
         this.loadTasks();
         this.notificationManager = new NotificationManager();
-        this.setupNotifications();
-    }
-
-    async setupNotifications() {
-        const hasPermission = await this.notificationManager.requestPermission();
-        if (hasPermission) {
-            this.notificationManager.startChecking();
-        }
     }
 
     async loadTasks() {
@@ -379,5 +381,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 enableRemindersBtn.disabled = true;
             }
         });
+    }
+
+    // Settings UI
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const pushToggle = document.getElementById('pushToggle');
+    const settingsClose = document.getElementById('settingsClose');
+
+    // open / close modal
+    settingsBtn.onclick = () => settingsModal.classList.add('show');
+    settingsClose.onclick = () => settingsModal.classList.remove('show');
+    window.addEventListener('click', e => {
+        if (e.target === settingsModal) settingsModal.classList.remove('show');
+    });
+
+    // initialise toggle state
+    pushToggle.checked = !!localStorage.getItem('pushEnabled');
+
+    // handle toggle
+    pushToggle.onchange = async () => {
+        if (pushToggle.checked) {
+            const granted = await taskManager.notificationManager.requestPermission();
+            if (!granted) {                   // user denied
+                pushToggle.checked = false;
+                return;
+            }
+            const token = await taskManager.notificationManager.subscribeToPush();
+            if (token) {
+                localStorage.setItem('pushEnabled','1');
+                taskManager.notificationManager.startChecking();
+            } else {
+                pushToggle.checked = false;     // subscription failed
+            }
+        } else {
+            // (Optional) unsubscribe from FCM here if you store tokens server-side
+            localStorage.removeItem('pushEnabled');
+        }
+    };
+
+    // start background checker automatically if already enabled
+    if (pushToggle.checked) {
+        taskManager.notificationManager.startChecking();
     }
 }); 
